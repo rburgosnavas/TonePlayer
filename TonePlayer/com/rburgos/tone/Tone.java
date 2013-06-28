@@ -30,16 +30,17 @@ public class Tone
         for (int i = 0; i < sampleLength; i++)
         {
             double time = i / SAMPLE_RATE;
+            
             /*
             double sine = (Math.sin(2 * Math.PI * freq * time) + 
                     Math.sin(2 * Math.PI * (freq / 1.8) * time) + 
                     Math.sin(2 * Math.PI * (freq / 1.5) * time)) / 3.0;
             */
-            double sine = (
-                    Math.sin(2 * Math.PI * freq * time) + 
-                    Math.sin(2 * Math.PI * ((freq / 1.8) * time)) * 
-                    Math.sin(2 * Math.PI * freq * time/3)) 
-                    / 3.0;
+            
+            double sine = (Math.sin(2 * Math.PI * freq * time) + 
+                    Math.sin(2 * Math.PI * freq / 1.8 * time) * 
+                    Math.exp(2 * Math.PI * freq * time / 2)) / 8.0;
+            
             shortBuffer.put((short) (16000 * sine));
         }
     }

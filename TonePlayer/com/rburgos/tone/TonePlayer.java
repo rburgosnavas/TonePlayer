@@ -1,49 +1,37 @@
 package com.rburgos.tone;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Font;
+import javax.sound.sampled.*;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Date;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.SourceDataLine;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 @SuppressWarnings("serial")
 public class TonePlayer extends JFrame
 {
-    JPanel mainPanel, statusBar;
-    JLabel status;
-    JButton hit;
-    JSlider frequency;
-    
-    AudioFormat audioFormat;
-    AudioInputStream audioIn;
-    SourceDataLine dataLine;
-    Tone tone = null;
+    private JPanel mainPanel, statusBar;
+	private JLabel status;
+	private JButton hit;
+	private JSlider frequency;
+
+	private AudioFormat audioFormat;
+	private AudioInputStream audioIn;
+	private SourceDataLine dataLine;
+	private Tone tone = null;
     
     static final float SAMPLE_RATE = 32000.0F;
     static final int BIT_SIZE = 8;
     static final int CHANNELS = 1;
     static final boolean SIGNED = false;
     static final boolean BIG_ENDIAN = false;
-    
-    byte audioData[] = new byte[16000 * 4];
-    
-    int freq;
+
+	private byte audioData[] = new byte[16000 * 4];
+
+	private int freq;
     
     public TonePlayer()
     {
@@ -81,7 +69,7 @@ public class TonePlayer extends JFrame
         statusBar = new JPanel();
         statusBar.add(status);
         
-        frequency = new JSlider(JSlider.HORIZONTAL, 1, 1000, 1);
+        frequency = new JSlider(JSlider.HORIZONTAL, 1, 100, 1);
         frequency.addChangeListener(new ChangeListener()
         {
             

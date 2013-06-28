@@ -1,13 +1,11 @@
 package com.rburgos.tone;
+
 import javax.sound.sampled.*;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.event.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.awt.event.*;
+import java.io.*;
 import java.util.Date;
 
 @SuppressWarnings("serial")

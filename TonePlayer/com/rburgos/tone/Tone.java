@@ -35,12 +35,12 @@ public class Tone
             double sine = (Math.sin(2 * Math.PI * freq * time) + 
                     Math.sin(2 * Math.PI * (freq / 1.8) * time) + 
                     Math.sin(2 * Math.PI * (freq / 1.5) * time)) / 3.0;
-            */
             
             double sine = (Math.sin(2 * Math.PI * freq * time) + 
                     Math.sin(2 * Math.PI * freq / 1.8 * time) * 
                     Math.exp(2 * Math.PI * freq * time / 2)) / 8.0;
-            
+            */
+	        double sine = (Math.sin(2.0 * Math.PI * time));
             shortBuffer.put((short) (16000 * sine));
         }
     }

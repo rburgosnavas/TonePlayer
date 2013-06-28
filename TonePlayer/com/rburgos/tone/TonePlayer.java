@@ -9,7 +9,7 @@ import java.io.*;
 import java.util.Date;
 
 @SuppressWarnings("serial")
-public class TonePlayer extends JFrame
+public class TonePlayer extends JFrame implements ActionListener
 {
     private JPanel mainPanel, statusBar;
 	private JLabel status;
@@ -128,8 +128,14 @@ public class TonePlayer extends JFrame
             }
         });
     }
-    
-    class ListenThread extends Thread
+
+	@Override
+	public void actionPerformed(ActionEvent e)
+	{
+		
+	}
+
+	class ListenThread extends Thread
     {
         byte playBuffer[] = new byte[16000];
         

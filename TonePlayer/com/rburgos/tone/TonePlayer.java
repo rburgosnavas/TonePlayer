@@ -6,7 +6,6 @@ import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.Date;
 
 @SuppressWarnings("serial")
 public class TonePlayer extends JFrame implements ActionListener
@@ -21,13 +20,13 @@ public class TonePlayer extends JFrame implements ActionListener
 	private SourceDataLine dataLine;
 	private Tone tone = null;
     
-    static final float SAMPLE_RATE = 32000.0F;
+    static final float SAMPLE_RATE = 8000.0F;
     static final int BIT_SIZE = 8;
     static final int CHANNELS = 1;
     static final boolean SIGNED = false;
     static final boolean BIG_ENDIAN = false;
 
-	private byte audioData[] = new byte[16000 * 4];
+	private byte buffer[] = new byte[16000 * 4];
 
 	private int freq;
     
@@ -55,10 +54,29 @@ public class TonePlayer extends JFrame implements ActionListener
             @Override
             public void actionPerformed(ActionEvent arg0)
             {
-                tone = new Tone(audioData);
+                tone = new Tone(buffer);
                 tone.setFrequency(freq);
                 tone.play();
                 playData();
+	            new Thread(new Runnable()
+	            {
+		            @Override
+		            public void run()
+		            {
+						while(true)
+						{
+							status.setText(System.nanoTime()/(100000*10000) + "");
+							try
+							{
+								Thread.sleep(1000);
+							}
+							catch (InterruptedException e)
+							{
+								e.printStackTrace();
+							}
+						}
+		            }
+	            }).start();
             }
         });
 
@@ -70,7 +88,6 @@ public class TonePlayer extends JFrame implements ActionListener
         frequency = new JSlider(JSlider.HORIZONTAL, 1, 100, 1);
         frequency.addChangeListener(new ChangeListener()
         {
-            
             @Override
             public void stateChanged(ChangeEvent e)
             {
@@ -87,27 +104,15 @@ public class TonePlayer extends JFrame implements ActionListener
     {
         try
         {
-            // InputStream takes a byte array audioData as buffer
-            InputStream in = new ByteArrayInputStream(audioData);
-            
-            // Initialize audioFormat
-            audioFormat = new AudioFormat(SAMPLE_RATE, BIT_SIZE, CHANNELS, 
+            InputStream in = new ByteArrayInputStream(buffer);
+            audioFormat = new AudioFormat(SAMPLE_RATE, BIT_SIZE, CHANNELS,
                     SIGNED, BIG_ENDIAN);
-            
-            // Calculate length of data stream
-            long len = audioData.length / audioFormat.getFrameSize();
-            
-            // Create audioIn
+            long len = buffer.length / audioFormat.getFrameSize();
             audioIn = new AudioInputStream(in, audioFormat, len);
             
-            // 
-            DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, 
+            DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class,
                     audioFormat);
-            
-            //
             dataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
-            
-            //
             new ListenThread().start();
         }
         catch (Exception e)
@@ -116,51 +121,15 @@ public class TonePlayer extends JFrame implements ActionListener
             System.exit(0);
         }
     }
-    
-    public static void main(String[] args)
-    {
-        EventQueue.invokeLater(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                new TonePlayer();
-            }
-        });
-    }
-
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		
-	}
 
 	class ListenThread extends Thread
     {
-        byte playBuffer[] = new byte[16000];
-        
+		byte playBuffer[] = new byte[16000 * 4];
         public void run()
         {
             try
             {
-                dataLine.open(audioFormat);
-                dataLine.start();
-                
-                int length;
-                
-                while ((length = audioIn.read(playBuffer, 0, playBuffer.length)) != -1)
-                {
-                    if (length > 0)
-                    {
-                        dataLine.write(playBuffer, 0, length);
-                    }
-                }
-                
-                dataLine.drain();
-                dataLine.stop();
-                dataLine.close();
-                
-                status.setText(new Date().getTime() + "");
+	            openData();
             }
             catch (Exception e)
             {
@@ -168,5 +137,44 @@ public class TonePlayer extends JFrame implements ActionListener
                 System.exit(0);
             }
         }
+
+	    private void openData() throws LineUnavailableException, IOException
+	    {
+		    dataLine.open(audioFormat);
+		    dataLine.start();
+
+		    int length;
+
+		    while ((length = audioIn.read(playBuffer, 0, playBuffer.length))
+				    != -1)
+		    {
+		        if (length > 0)
+		        {
+		            dataLine.write(playBuffer, 0, length);
+		        }
+		    }
+
+		    dataLine.drain();
+		    dataLine.stop();
+		    dataLine.close();
+	    }
     }
+
+	@Override
+	public void actionPerformed(ActionEvent e)
+	{
+		// TODO
+	}
+
+	public static void main(String[] args)
+	{
+		EventQueue.invokeLater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				new TonePlayer();
+			}
+		});
+	}
 }
